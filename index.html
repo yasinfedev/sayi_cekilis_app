@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayı Aralığı Random Çekiliş</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Sayı Aralığı Random Çekiliş</h1>
+        
+        <!-- Sayı aralığı giriş alanı -->
+        <div class="row mb-3">
+            <div class="col">
+                <label for="minNumber" class="form-label">Başlangıç Sayısı</label>
+                <input type="number" class="form-control" id="minNumber" placeholder="1">
+            </div>
+            <div class="col">
+                <label for="maxNumber" class="form-label">Bitiş Sayısı</label>
+                <input type="number" class="form-control" id="maxNumber" placeholder="177">
+            </div>
+        </div>
+        
+        <!-- Çekiliş yap ve sıfırla butonları -->
+        <div class="mb-3">
+            <button id="drawButton" class="btn btn-primary">Çekiliş Yap</button>
+            <button id="resetButton" class="btn btn-secondary">Reset</button>
+        </div>
+        
+        <!-- Sonuç alanı -->
+        <div class="alert alert-info" id="result" role="alert">Sonuç burada gösterilecek.</div>
+
+        <!-- Seçilen numaraların listesi -->
+        <h4>Seçilen Numaralar:</h4>
+        <ul id="selectedNumbersList" class="list-group"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const drawButton = document.getElementById('drawButton');
+            const resetButton = document.getElementById('resetButton');
+            const minNumberInput = document.getElementById('minNumber');
+            const maxNumberInput = document.getElementById('maxNumber');
+            const resultDiv = document.getElementById('result');
+            const selectedNumbersList = document.getElementById('selectedNumbersList');
+            
+            let availableNumbers = [];
+            let selectedNumbers = [];
+            let drawCount = 0;
+
+            drawButton.addEventListener('click', function () {
+                const minNumber = parseInt(minNumberInput.value);
+                const maxNumber = parseInt(maxNumberInput.value);
+
+                // İlk çekiliş ise, sayılar listesini oluştur
+                if (availableNumbers.length === 0) {
+                    if (isNaN(minNumber) || isNaN(maxNumber) || minNumber >= maxNumber) {
+                        resultDiv.textContent = "Lütfen geçerli bir sayı aralığı girin.";
+                        resultDiv.classList.replace('alert-info', 'alert-danger');
+                        return;
+                    }
+
+                    // Aralıktaki sayıları oluştur
+                    for (let i = minNumber; i <= maxNumber; i++) {
+                        availableNumbers.push(i);
+                    }
+                }
+
+                // Eğer tüm sayılar seçildiyse hata mesajı göster
+                if (availableNumbers.length === selectedNumbers.length) {
+                    resultDiv.textContent = "Hata: Çekiliş gerçekleştirilemez. Tüm sayılar seçildi.";
+                    resultDiv.classList.replace('alert-info', 'alert-danger');
+                    return;
+                }
+
+                // Kullanılmayan sayılardan rastgele bir tane seç
+                let remainingNumbers = availableNumbers.filter(num => !selectedNumbers.includes(num));
+                let randomIndex = Math.floor(Math.random() * remainingNumbers.length);
+                let selectedNumber = remainingNumbers[randomIndex];
+
+                // Seçilen sayıyı kaydet ve sonuç kısmına yaz
+                selectedNumbers.push(selectedNumber);
+                drawCount++;
+                resultDiv.textContent = `Çekilen Sayı: ${selectedNumber}`;
+                resultDiv.classList.replace('alert-danger', 'alert-info');
+
+                // Seçilen sayıyı listeye ekle
+                let listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                listItem.textContent = `${drawCount}. Çekilen Sayı: ${selectedNumber}`;
+                selectedNumbersList.appendChild(listItem);
+            });
+
+            // Reset butonuna basıldığında tüm verileri sıfırla
+            resetButton.addEventListener('click', function () {
+                availableNumbers = [];
+                selectedNumbers = [];
+                drawCount = 0;
+                resultDiv.textContent = "Sonuç burada gösterilecek.";
+                resultDiv.classList.replace('alert-danger', 'alert-info');
+                selectedNumbersList.innerHTML = "";
+                minNumberInput.value = "";
+                maxNumberInput.value = "";
+            });
+        });
+    </script>
+</body>
+</html>
